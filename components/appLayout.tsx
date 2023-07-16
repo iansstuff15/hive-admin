@@ -1,7 +1,10 @@
 "use client"
+import { auth } from '@/firebase/firebase';
 import { BarChartOutlined, HomeOutlined, UserOutlined } from '@ant-design/icons';
-import { Card, Layout, Menu, MenuProps } from 'antd';
+import { Button, Card, Layout, Menu, MenuProps } from 'antd';
+import { signOut } from 'firebase/auth';
 import { usePathname, useRouter} from 'next/navigation'
+import { useState } from 'react';
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -9,8 +12,10 @@ interface layoutProps {
     children: React.ReactNode
 }
 const AppLayout: React.FC<layoutProps> = ({children}) => {
+
   const router = useRouter()
   const pathname = usePathname()
+  const [loading,setLoading] = useState(false)
   const navigationItems: MenuProps['items'] = [
     {
         label: 'Home',
@@ -25,10 +30,10 @@ const AppLayout: React.FC<layoutProps> = ({children}) => {
         onClick: () => router.push('/user'),
     },
     {
-      label: 'Analytics',
-      key: '/analytics',
+      label: 'Activities',
+      key: '/activities',
       icon: <BarChartOutlined />,
-      onClick: () => router.push('/analytics'),
+      onClick: () => router.push('/activities'),
   },
 ]
   return (
@@ -38,6 +43,11 @@ const AppLayout: React.FC<layoutProps> = ({children}) => {
       <h1>IT Admin</h1>
       <br/> 
       <Menu theme="light" defaultSelectedKeys={[pathname]} mode="inline" items={navigationItems} />
+      <Button block loading={loading} onClick={async()=>{
+        setLoading(true)
+        await signOut(auth)
+        setLoading(false)
+        }} >Logout</Button>
     </Sider>
     <Layout>
       

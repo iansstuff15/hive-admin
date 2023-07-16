@@ -1,14 +1,15 @@
 "use client"
 import AppLayout from "@/components/appLayout";
-import { Button, Segmented } from "antd";
+import { Button, Col, Row, Segmented } from "antd";
 import { usePathname } from "next/navigation";
 import { Space, Table } from 'antd';
 import { useEffect, useState } from "react";
 import type { ColumnsType } from 'antd/es/table';
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "@/firebase/firebase";
-
-export default function Home() {
+import PieChart from "@/components/charts/pie";
+import jsonexport from 'jsonexport'
+export default function   Home() {
   const pathName = usePathname()
   interface DataType {
     key: string;
@@ -17,7 +18,26 @@ export default function Home() {
     phone: string;
     
   }
-  
+  const handleDownloadCSV = (list:any) =>{
+    jsonexport(list, function(err:any, csv:any){
+        if (err) return console.error(err);
+        console.log('csv here')
+        console.log(csv);
+        downloadBlob(csv, 'export.csv', 'text/csv;charset=utf-8;')
+    }
+    )
+}
+function downloadBlob(content:any, filename:any, contentType:any) {
+  // Create a blob
+  var blob = new Blob([content], { type: contentType });
+  var url = URL.createObjectURL(blob);
+
+  // Create a link to download it
+  var pom = document.createElement('a');
+  pom.href = url;
+  pom.setAttribute('download', filename);
+  pom.click();
+}
   const customerColumns: ColumnsType<DataType> = [
     {
       title: 'First Name',
@@ -118,6 +138,7 @@ export default function Home() {
 
         setBusinessData(temptArray)
       })
+      console
     },[])
   
 
@@ -126,11 +147,32 @@ export default function Home() {
     <AppLayout>
         <h1>{pathName.split('/').toString().toUpperCase().split(',')}</h1>
         <br/>
-        <Segmented options={['Customer', 'Businesses',]} onChange={(value)=>{
+        <Row gutter={12}>
+      <Col span={12}> <PieChart title={'User types distribution'} data={[{type:'Customers',value:customerData?.length??0},{type:'Businesses',value:businessData?.length??0}]}/></Col>
+      <Col span={12}> <PieChart title={'Business types distribution'} data={[
+        {type:'Technician',value:businessData?.filter((data)=>data.type=='Technician').length??0},
+        {type:'Water Refilling Station',value:businessData?.filter((data)=>data.type=='Water Refilling Station').length??0},
+        {type:'Plumber',value:businessData?.filter((data)=>data.type=='Plumber').length??0},
+    ]}/></Col>
+      
+    </Row>
+       
+    <br/>
+    <Row>
+      <Col span={12}>
+      <Segmented options={['Customer', 'Businesses',]} onChange={(value)=>{
           setTableSegmenter(value.toString())
           }} />
-        <br/>
-        <br/> 
+      </Col>
+      <Col span={12} style={{padding:'0 1rem'}} >
+      <Button type="primary" style={{marginRight:'1rem'}}
+      onClick={()=>handleDownloadCSV(customerData)}
+      >Download customer account data</Button>
+        <Button type="primary"  onClick={()=>handleDownloadCSV(businessData)}>Download business account data</Button>
+      </Col>
+    </Row>  
+       
+       <br/> 
        {tableSegmenter=="Customer"?
        <Table columns={customerColumns} dataSource={ customerData} pagination={false} style={{overflowX:'scroll'}} />: 
        <Table columns={businessColumns} dataSource={ businessData} pagination={false} style={{overflowX:'scroll'}}  /> 
