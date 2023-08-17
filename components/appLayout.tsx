@@ -29,7 +29,7 @@ const AppLayout: React.FC<layoutProps> = ({children}) => {
         icon: <UserOutlined />,
         onClick: () => router.push('/user'),
     },
-    {
+    { 
       label: 'Activities',
       key: '/activities',
       icon: <BarChartOutlined />,
@@ -37,7 +37,7 @@ const AppLayout: React.FC<layoutProps> = ({children}) => {
   },
 ]
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout style={{ height: '100vh' }}>
     <Sider style={{background:'white',padding:'1rem'}} >
       <h1>Hive</h1>
       <h1>IT Admin</h1>
@@ -51,7 +51,7 @@ const AppLayout: React.FC<layoutProps> = ({children}) => {
     </Sider>
     <Layout>
       
-      <Content style={{ margin: '0 16px' }}>
+      <Content style={{ margin: '0 16px' ,height:"100vh",overflowY:'scroll'}}>
         <br/>
         <Card>{children}</Card>
       </Content>

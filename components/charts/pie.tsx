@@ -1,6 +1,11 @@
 'use client'
 
-import { Pie } from "@ant-design/charts";
+import dynamic from 'next/dynamic'
+const Pie = dynamic(
+  () => import('@ant-design/plots/es/components/pie'),
+  { ssr: false }
+)
+
 import { Card } from "antd";
 
 interface chartProps{
@@ -37,7 +42,7 @@ const PieChart:React.FC<chartProps> = ({data,title}) =>{
       };
     return(<Card title={title} style={{height:300,  }} >
    
-    <Pie data={data??[{type:'',value:0}]} style={{width:300,height:200}} {...config} />
+    <Pie data={data??[{type:'',value:0}]} style={{width:350,height:200}} {...config} />
     </Card>)
 }
 

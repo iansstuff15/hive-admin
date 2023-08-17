@@ -5,12 +5,15 @@ import { usePathname } from "next/navigation";
 import { Space, Table } from 'antd';
 import { useEffect, useState } from "react";
 import type { ColumnsType } from 'antd/es/table';
-import { collection, onSnapshot } from "firebase/firestore";
+import { collection, doc, getDoc, onSnapshot } from "firebase/firestore";
 import { db } from "@/firebase/firebase";
 import PieChart from "@/components/charts/pie";
 import jsonexport from 'jsonexport'
 export default function Home() {
   const pathName = usePathname()
+  const [isOpenUserDrawer, setIsUpenUserDrawer] = useState(false)
+  const [userUID, setUserUID] = useState('1234')
+  const [userRole, setUserRole] = useState('1234')
   interface DataType {
     key: string;
     firstName: string;
@@ -26,6 +29,29 @@ export default function Home() {
         downloadBlob(csv, 'export.csv', 'text/csv;charset=utf-8;')
     }
     )
+}
+async function findUserTypeByUid(uid:string) {
+  try {
+  
+    const businessCollectionRef = doc(collection(db, "business"), uid);
+
+    
+
+    
+    const businessSnapshot = await getDoc(businessCollectionRef);
+
+    if (businessSnapshot.data()) {
+     
+      return "business";
+    }
+    
+
+    return'customer'
+  } catch (error) {
+    console.error("Error searching Firestore:", error);
+    // You can handle the error as per your requirement
+    throw error;  
+  }
 }
 function downloadBlob(content:any, filename:any, contentType:any) {
   // Create a blob
@@ -56,16 +82,16 @@ function downloadBlob(content:any, filename:any, contentType:any) {
       key: 'phone',
     },
     
-    {
-      title: 'Action',
-      key: 'action',
-      render: (_, record) => (
-        <Space size="middle">
-          <Button type="text">Send Password Reset</Button>
-          <Button type="text">Delete </Button>
-        </Space>
-      ),
-    },
+    // {
+    //   title: 'Action',
+    //   key: 'action',
+    //   render: (_, record) => (
+    //     <Space size="middle">
+    //       <Button type="text">Send Password Reset</Button>
+    //       <Button type="text">Delete </Button>
+    //     </Space>
+    //   ),
+    // },
   ];
   
 
@@ -100,17 +126,17 @@ function downloadBlob(content:any, filename:any, contentType:any) {
       dataIndex: 'type',
       key: 'type',
     },
-    {
-      title: 'Action',
-      key: 'action',
-      render: (_, record) => (
-        <Space size="middle">
-          <Button type="text">Send Password Reset</Button>
-          <Button type="text">Approve Application</Button>
-          <Button type="text">Delete </Button>
-        </Space>
-      ),
-    },
+    // {
+    //   title: 'Action',
+    //   key: 'action',
+    //   render: (_, record) => (
+    //     <Space size="middle">
+    //       <Button type="text">Send Password Reset</Button>
+    //       <Button type="text">Approve Application</Button>
+    //       <Button type="text">Delete </Button>
+    //     </Space>
+    //   ),
+    // },
   ];
   
   const [customerData, setCustomerData] = useState<Array<any>>()

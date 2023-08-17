@@ -6,7 +6,9 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { useSnapshot } from 'valtio'
 import { state } from '@/state/state'
-
+import { usePathname, useRouter } from 'next/navigation'
+import { useEffect } from 'react'
+import { AppProgressBar as ProgressBar } from 'next-nprogress-bar';
 const inter = Inter({ subsets: ['latin'] })
 
 
@@ -15,23 +17,40 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  const pathName = usePathname()
+  const router = useRouter()
   const snapshot = useSnapshot(state)
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
+  useEffect(()=>{
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        
+        const uid = user.uid;
+  
+        state.uid = uid
+        
+      } else {
       
-      const uid = user.uid;
+  
+        state.uid = ""
+      if(pathName!= '/' && state.uid==""){
+        router.push('/')
+      } 
+      }
+    });
+  },[])
+ 
 
-      state.uid = uid
-      
-    } else {
-    
-
-      state.uid = ""
-    }
-  });
+  
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>{children}
+      <ProgressBar
+          height="18px"
+          color="#fffd00"
+          options={{ showSpinner: false }}
+         
+        />
+      </body>
     </html>
   )
 }
